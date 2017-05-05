@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout cardContainer;
     private SharedPreferences.Editor editor;
     private TextView addCardButton;
+    private ImageView imgSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private void initialize() {
         addCardButton = (TextView) findViewById(R.id.add_card);
         cardContainer = (LinearLayout) findViewById(R.id.card_container);
+        imgSettings = (ImageView) findViewById(R.id.settings);
         sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 //        getSupportActionBar().setTitle("Payment");

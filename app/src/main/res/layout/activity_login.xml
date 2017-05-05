@@ -16,11 +16,11 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:layout_centerHorizontal="true"
         android:elevation="4dp"
         android:layout_marginTop="15dp"
-        android:src="@drawable/ic_billing_mastercard_logo"
+        android:src="@drawable/logo"
         tools:ignore="ContentDescription"/>
 
     <com.kevalpatel.passcodeview.PinView
