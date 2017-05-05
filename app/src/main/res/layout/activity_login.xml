@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_bg"
+    android:paddingBottom="10dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="10dp"
+    tools:context="com.cooltechworks.creditcarddesign.sample.LoginActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:elevation="4dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/ic_billing_mastercard_logo"
+        tools:ignore="ContentDescription"/>
+
+    <com.kevalpatel.passcodeview.PinView
+        android:id="@+id/pin_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageView"
+        android:padding="30dp"
+        android:layout_marginTop="30dp"
+        app:dividerColor="@color/bluishgreen"
+        app:pin_titleText="Enter your PIN"
+        app:pin_titleTextColor="@color/white"
+        app:titleTextColor="@android:color/white"/>
+
+</RelativeLayout>
