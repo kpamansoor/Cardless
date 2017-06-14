@@ -13,6 +13,25 @@
     android:background="@drawable/login_bg"
     android:layout_gravity="center"
     tools:context="com.cooltechworks.creditcarddesign.sample.SignUpActivity">
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_centerHorizontal="true"
+        android:elevation="4dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/logo_main"
+        tools:ignore="ContentDescription"/>
+    <TextView
+        android:id="@+id/text3"
+        android:layout_below="@id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="CardHolder"
+        android:textSize="25dp"
+        android:fontFamily="sans-serif-thin"
+        android:textColor="#fff"/>
 
     <TextView
         android:id="@+id/tvMsgText"
@@ -20,8 +39,9 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="#ffffff"
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="30dp"
-        android:text="Enter the PIN"/>
+        android:text="Set your PIN"/>
 
     <com.andrognito.pinlockview.IndicatorDots
         android:id="@+id/indicator_dots"
@@ -37,18 +57,21 @@
         android:layout_height="1dp"
         android:layout_marginBottom="30dp"
         android:background="#137FC1" />
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center">
     <com.andrognito.pinlockview.PinLockView
         android:id="@+id/pin_lock_view"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:foregroundGravity="center_horizontal"
         app:keypadTextSize="16dp"
-        app:keypadButtonSize="60dp"
-        app:keypadVerticalSpacing="24dp"
-        app:keypadHorizontalSpacing="36dp"
+        app:keypadButtonSize="40dp"
+        app:keypadVerticalSpacing="15dp"
+        app:keypadHorizontalSpacing="15dp"
         app:keypadButtonBackgroundDrawable="@drawable/ring_shape"
         app:dotFilledBackground="@drawable/round_shape"
-        android:layout_gravity="center"
     />
-
+</LinearLayout>
 </LinearLayout>

@@ -4,8 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.fingerprint.FingerprintManager;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +37,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +59,13 @@ import com.kevalpatel.passcodeview.keys.RoundKey;
 import com.kevalpatel.passcodeview.patternCells.CirclePatternCell;
 import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
 import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.SIGNAL_PERSISTENT_PROCESSES;
 
 /**
  * A login screen that offers login via email/password.
@@ -55,13 +76,39 @@ public class LoginActivity extends Activity {
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+    private static final String KEY_NAME = "cardless";
+    private SharedPreferences sharedpreferences;
 
-
-
+    TextView message;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
+        if(sharedpreferences.getString("pin","NULL") == "NULL") {
+            startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            finish();
+        }
+
+        message = (TextView) findViewById(R.id.message);
+  /*      final FingerprintHandler fph = new FingerprintHandler(message);
+        if (!checkFinger()) {
+//            btn.setEnabled(false);
+        }
+        else {
+            // We are ready to set up the cipher and the key
+            try {
+                generateKey();
+                Cipher cipher = generateCipher();
+                FingerprintManager.CryptoObject cryptoObject =
+                        new FingerprintManager.CryptoObject(cipher);
+            }
+            catch(FingerprintException fpe) {
+                // Handle exception
+//                btn.setEnabled(false);
+            }
+        }*/
 
         PinView pinView = (PinView) findViewById(R.id.pin_view);
         pinView.setCorrectPin(new int[]{1, 2, 3, 4});
@@ -106,10 +153,6 @@ public class LoginActivity extends Activity {
                 //Do something if you want to handle unauthorized user.
             }
         });
-
-
     }
-
-
 }
 

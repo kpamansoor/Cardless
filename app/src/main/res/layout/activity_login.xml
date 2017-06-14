@@ -16,23 +16,37 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
-        android:layout_height="150dp"
+        android:layout_height="80dp"
         android:layout_centerHorizontal="true"
         android:elevation="4dp"
         android:layout_marginTop="15dp"
-        android:src="@drawable/logo"
+        android:src="@drawable/logo_main"
         tools:ignore="ContentDescription"/>
+    <TextView
+        android:id="@+id/text3"
+        android:layout_below="@id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="CardHolder"
+        android:textSize="25dp"
+        android:fontFamily="sans-serif-thin"
+        android:textColor="#fff"/>
 
     <com.kevalpatel.passcodeview.PinView
         android:id="@+id/pin_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageView"
+        android:layout_below="@id/text3"
         android:padding="30dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="5dp"
         app:dividerColor="@color/bluishgreen"
         app:pin_titleText="Enter your PIN"
         app:pin_titleTextColor="@color/white"
         app:titleTextColor="@android:color/white"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/message"/>
 
 </RelativeLayout>

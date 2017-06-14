@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     private void initialize() {
         addCardButton = (TextView) findViewById(R.id.add_card);
         cardContainer = (LinearLayout) findViewById(R.id.card_container);
-        imgSettings = (ImageView) findViewById(R.id.settings);
         sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
 //        getSupportActionBar().setTitle("Payment");
@@ -182,7 +181,8 @@ public class MainActivity extends AppCompatActivity {
             jsonObj.put("expiry", creditCardView.getExpiry());
             jsonObj.put("cvv", creditCardView.getCVV());
 
-            jsonArr = new JSONArray(sharedpreferences.getString("csdetails","NULL"));
+            if(sharedpreferences.getString("csdetails","NULL") != "NULL")
+                jsonArr = new JSONArray(sharedpreferences.getString("csdetails","NULL"));
             jsonArr.put(jsonObj);
 
             editor.putString("csdetails", jsonArr.toString());

@@ -4,11 +4,11 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
-    <string name="add_card">ADD CARD</string>
+    <string name="add_card">ADD NEW CARD</string>
     <string name="previous">PREVIOUS</string>
     <string name="done">DONE</string>
     <string name="title_activity_main">CreditCardView Sample</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">Card Holder</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
