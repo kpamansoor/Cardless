@@ -14,7 +14,8 @@
         <activity
             android:name="com.cooltechworks.creditcarddesign.CardEditActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="com.cooltechworks.creditcarddesign.sample.MainActivity"
             android:label="@string/title_activity_main"
@@ -22,7 +23,8 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name="com.cooltechworks.creditcarddesign.sample.LoginActivity"
-            android:label="@string/title_activity_login">
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

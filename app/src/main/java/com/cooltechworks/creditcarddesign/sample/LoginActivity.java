@@ -14,6 +14,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -30,6 +31,8 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -72,10 +75,7 @@ import static android.Manifest.permission.SIGNAL_PERSISTENT_PROCESSES;
  */
 public class LoginActivity extends Activity {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
+
     private static final String KEY_NAME = "cardless";
     private SharedPreferences sharedpreferences;
 
@@ -84,34 +84,26 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar));
 
         sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
+
         if(sharedpreferences.getString("pin","NULL") == "NULL") {
             startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
             finish();
         }
 
         message = (TextView) findViewById(R.id.message);
-  /*      final FingerprintHandler fph = new FingerprintHandler(message);
-        if (!checkFinger()) {
-//            btn.setEnabled(false);
-        }
-        else {
-            // We are ready to set up the cipher and the key
-            try {
-                generateKey();
-                Cipher cipher = generateCipher();
-                FingerprintManager.CryptoObject cryptoObject =
-                        new FingerprintManager.CryptoObject(cipher);
-            }
-            catch(FingerprintException fpe) {
-                // Handle exception
-//                btn.setEnabled(false);
-            }
-        }*/
+
 
         PinView pinView = (PinView) findViewById(R.id.pin_view);
-        pinView.setCorrectPin(new int[]{1, 2, 3, 4});
+        if(sharedpreferences.getString("pin","NULL") != "NULL") {
+            pinView.setCorrectPin(parseInt(sharedpreferences.getString("pin","NULL").toString()));
+        }
+//        pinView.setCorrectPin(new int[]{1, 2, 3, 4});
 
         //Build the desired key shape and pass the theme parameters.
         //REQUIRED
@@ -153,6 +145,16 @@ public class LoginActivity extends Activity {
                 //Do something if you want to handle unauthorized user.
             }
         });
+    }
+
+    private static int[] parseInt(String str) {
+        int i;
+        int[] n = new int[str.length()];
+
+        for (i = 0; i < str.length(); i++) {
+            n[i]= str.charAt(i) - 48;
+        }
+        return n;
     }
 }
 

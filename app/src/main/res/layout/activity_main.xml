@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
     android:layout_width="match_parent"
@@ -29,6 +30,7 @@
             android:layout_marginLeft="3dp"
             android:fontFamily="sans-serif-thin"
             android:textColor="#fff"/>
+
     </LinearLayout>
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -100,16 +102,30 @@
         <!--/>-->
 
     </ScrollView>
-
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:background="@color/bottom_color"
+    android:weightSum="10">
     <TextView
         android:id="@+id/add_card"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="9"
         android:layout_height="wrap_content"
-        android:background="@color/green_continue"
+        android:background="@color/bottom_color"
         android:gravity="center"
         android:padding="@dimen/padding_normal"
         android:text="@string/add_card"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/text_size_small"
-        android:layout_alignParentBottom="true"/>
+        android:textSize="@dimen/text_size_small"/>
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:src="@drawable/dot"
+        android:id="@+id/imgSettings" />
+</LinearLayout>
 </RelativeLayout>

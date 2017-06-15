@@ -23,5 +23,7 @@
     <color name="colorAccent">#009688</color>
     <color name="bluishgreen">#137FC1</color>
     <color name="white">#FFFFFF</color>
+    <color name="status_bar">#271F2A</color>
+    <color name="bottom_color">#240B20</color>
 
 </resources>
