@@ -1,5 +1,7 @@
 package com.cooltechworks.creditcarddesign.sample;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +25,10 @@ import com.cooltechworks.checkoutflow.R;
 import com.cooltechworks.creditcarddesign.CreditCardView;
 import com.cooltechworks.creditcarddesign.CardEditActivity;
 import com.cooltechworks.creditcarddesign.CreditCardUtils;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,11 +48,18 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     private TextView addCardButton;
     private ImageView imgSettings;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259828");
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -164,7 +177,8 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this, "No card details found", Toast.LENGTH_SHORT).show();
 
                         } else if (item.getTitle().equals("How to use")) {
-
+                            startActivity(new Intent(MainActivity.this, IntroActivity.class).putExtra("howto",true));
+                            finish();
                         }
 
                         return true;
@@ -173,6 +187,15 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 popup.show();//showing popup menu
+            }
+
+        });
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                // Load the next interstitial.
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
 
         });
@@ -214,7 +237,11 @@ public class MainActivity extends AppCompatActivity {
         creditCardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                Toast.makeText(MainActivity.this, "log press found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Card no copied to clipboad", Toast.LENGTH_SHORT).show();
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                final CreditCardView creditCardView = (CreditCardView) view;
+                ClipData clip = ClipData.newPlainText("text", creditCardView.getCardNumber());
+                clipboard.setPrimaryClip(clip);
                 return true;
             }
         });
@@ -282,4 +309,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+    }
 }
