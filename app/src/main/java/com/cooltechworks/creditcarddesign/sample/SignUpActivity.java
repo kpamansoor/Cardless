@@ -26,8 +26,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     PinLockView mPinLockView;
     IndicatorDots mIndicatorDots;
-    private SharedPreferences sharedpreferences;
-    private SharedPreferences.Editor editor;
+    SecureStorage ss;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,14 +36,12 @@ public class SignUpActivity extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar));
 
-        sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
-        editor = sharedpreferences.edit();
-
-
+        ss =  new SecureStorage(SignUpActivity.this, getApplication());
         mPinLockView = (PinLockView) findViewById(R.id.pin_lock_view);
         mPinLockView.setPinLockListener(mPinLockListener);
         mIndicatorDots = (IndicatorDots) findViewById(R.id.indicator_dots);
         mPinLockView.attachIndicatorDots(mIndicatorDots);
+
     }
 
     private PinLockListener mPinLockListener = new PinLockListener() {
@@ -58,8 +55,7 @@ public class SignUpActivity extends AppCompatActivity {
                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
                         public void onClick(SweetAlertDialog sDialog) {
-                            editor.putString("pin", pin);
-                            editor.commit();
+                            ss.storData("pin",pin);
                             sDialog.dismissWithAnimation();
                             startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                             finish();

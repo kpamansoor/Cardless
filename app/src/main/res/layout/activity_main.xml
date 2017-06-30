@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
     android:layout_width="match_parent"
@@ -108,6 +109,7 @@
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:background="@color/bottom_color"
+    android:visibility="gone"
     android:weightSum="10">
     <TextView
         android:id="@+id/add_card"
@@ -128,4 +130,14 @@
         android:src="@drawable/dot"
         android:id="@+id/imgSettings" />
 </LinearLayout>
+    <com.github.ag.floatingactionmenu.OptionsFabLayout
+        android:id="@+id/fab_l"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        custom:color="@color/logo_color"
+        custom:options_color="@color/colorPrimary"
+        custom:options_menu="@menu/add_menu"
+        custom:src="@android:drawable/ic_input_add"
+        custom:background_color="#00FFFFFF"/>
 </RelativeLayout>

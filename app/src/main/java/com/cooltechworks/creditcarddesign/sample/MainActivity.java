@@ -4,7 +4,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +23,7 @@ import com.cooltechworks.checkoutflow.R;
 import com.cooltechworks.creditcarddesign.CreditCardView;
 import com.cooltechworks.creditcarddesign.CardEditActivity;
 import com.cooltechworks.creditcarddesign.CreditCardUtils;
+import com.github.ag.floatingactionmenu.OptionsFabLayout;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -35,6 +34,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.card.payment.CardIOActivity;
+import io.card.payment.CreditCard;
 
 /**
  * Created by mansoor on 5/3/17.
@@ -43,22 +44,26 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class MainActivity extends AppCompatActivity {
 
     private final int CREATE_NEW_CARD = 0;
-    private SharedPreferences sharedpreferences;
+    private final int MY_SCAN_REQUEST_CODE = 1;
     private LinearLayout cardContainer;
-    private SharedPreferences.Editor editor;
     private TextView addCardButton;
     private ImageView imgSettings;
     private InterstitialAd mInterstitialAd;
+    SecureStorage ss;
+    OptionsFabLayout fabWithOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259828");
+        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259830");// Testing
+//        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259828");// Production
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // Testing
+//        mInterstitialAd.setAdUnitId("ca-app-pub-1243068719441957/7477993022"); // Production
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        ss =  new SecureStorage(MainActivity.this, getApplication());
 
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -73,20 +78,26 @@ public class MainActivity extends AppCompatActivity {
         imgSettings = (ImageView) findViewById(R.id.imgSettings);
         addCardButton = (TextView) findViewById(R.id.add_card);
         cardContainer = (LinearLayout) findViewById(R.id.card_container);
-        sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
-        editor = sharedpreferences.edit();
-//        getSupportActionBar().setTitle("Payment");
+        fabWithOptions = (OptionsFabLayout) findViewById(R.id.fab_l);
+
+        //Set mini fab's colors.
+        fabWithOptions.setMiniFabsColors(
+                R.color.logo_color,
+                R.color.logo_color,
+                R.color.green_fab,
+                R.color.green_fab,
+                R.color.green_fab);
         populate();
     }
 
     private void populate() {
         CreditCardView sampleCreditCardView;
 
-        if (!sharedpreferences.getString("csdetails", "NULL").equals("NULL")) {
+        if (!ss.readData("csdetails").equals("NULL")) {
             JSONObject cards;
             JSONArray jsonArr;
             try {
-                jsonArr = new JSONArray(sharedpreferences.getString("csdetails", "NULL"));
+                jsonArr = new JSONArray(ss.readData("csdetails"));
                 for (int i = 0; i < jsonArr.length(); i++) {
                     cards = (JSONObject) jsonArr.get(i);
 
@@ -113,83 +124,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void listeners() {
         addCardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(MainActivity.this, CardEditActivity.class);
-                startActivityForResult(intent, CREATE_NEW_CARD);
+//                onScanPress(v);
+//                Intent intent = new Intent(MainActivity.this, CardEditActivity.class);
+//                startActivityForResult(intent, CREATE_NEW_CARD);
             }
         });
 
-        imgSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PopupMenu popup = new PopupMenu(MainActivity.this, imgSettings);
-                //Inflating the Popup using xml file
-                popup.getMenuInflater().inflate(R.menu.poupup_menu, popup.getMenu());
 
-                //registering popup with OnMenuItemClickListener
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getTitle().equals("Change PIN"))
-                            startActivity(new Intent(MainActivity.this, SignUpActivity.class));
-                        else if (item.getTitle().equals("Delete All")) {
-
-                            JSONObject jsonObj = new JSONObject();
-                            JSONArray jsonArr = new JSONArray();
-                            if (sharedpreferences.getString("csdetails", "NULL") != "NULL") {
-                                try {
-                                    jsonArr = new JSONArray(sharedpreferences.getString("csdetails", "NULL"));
-                                    if (jsonArr.length() > 0) {
-                                        new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                                .setTitleText("Confirm?")
-                                                .setContentText("All card details will be wiped permanently. Sure to proceed?")
-                                                .setConfirmText("Delete")
-                                                .setCancelText("Cancel")
-                                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                                    @Override
-                                                    public void onClick(SweetAlertDialog sDialog) {
-
-                                                        editor.remove("csdetails");
-                                                        editor.commit();
-                                                        finish();
-                                                        startActivity(getIntent());
-                                                        Toast.makeText(MainActivity.this, "Data deleted permanently", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                })
-                                                .showCancelButton(true)
-                                                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                                    @Override
-                                                    public void onClick(SweetAlertDialog sDialog) {
-                                                        sDialog.cancel();
-                                                    }
-                                                })
-                                                .show();
-                                    } else
-                                        Toast.makeText(MainActivity.this, "No card details found", Toast.LENGTH_SHORT).show();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            } else
-                                Toast.makeText(MainActivity.this, "No card details found", Toast.LENGTH_SHORT).show();
-
-                        } else if (item.getTitle().equals("How to use")) {
-                            startActivity(new Intent(MainActivity.this, IntroActivity.class).putExtra("howto",true));
-                            finish();
-                        }
-
-                        return true;
-                    }
-
-                });
-
-                popup.show();//showing popup menu
-            }
-
-        });
 
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
@@ -199,28 +145,119 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+                Log.i("Ads", "onAdLoaded");
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // Code to be executed when an ad request fails.
+                Log.i("Ads", "onAdFailedToLoad");
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when the ad is displayed.
+                Log.i("Ads", "onAdOpened");
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+                Log.i("Ads", "onAdLeftApplication");
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when when the interstitial ad is closed.
+                Log.i("Ads", "onAdClosed");
+            }
+        });
+
+        fabWithOptions.setMainFabOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Toast.makeText(MainActivity.this, "Main fab clicked!", Toast.LENGTH_SHORT).show();
+                if(fabWithOptions.isOptionsMenuOpened())
+                    fabWithOptions.closeOptionsMenu();
+            }
+        });
+
+        //Set mini fabs clicklisteners.
+        fabWithOptions.setMiniFabSelectedListener(new OptionsFabLayout.OnMiniFabSelectedListener() {
+            @Override
+            public void onMiniFabSelected(MenuItem fabItem) {
+                switch (fabItem.getItemId()) {
+                    case R.id.add_manual:
+                        Intent intent = new Intent(MainActivity.this, CardEditActivity.class);
+                        startActivityForResult(intent, CREATE_NEW_CARD);
+                        fabWithOptions.closeOptionsMenu();
+                        break;
+                    case R.id.add_auto:
+                        onScanPress();
+                        fabWithOptions.closeOptionsMenu();
+                    case R.id.change_pin:
+                        startActivity(new Intent(MainActivity.this, SignUpActivity.class));
+                        fabWithOptions.closeOptionsMenu();
+                        break;
+                    case R.id.delete_all:
+                        JSONObject jsonObj = new JSONObject();
+                        JSONArray jsonArr = new JSONArray();
+                        if (ss.readData("csdetails") != "NULL") {
+                            try {
+                                jsonArr = new JSONArray(ss.readData("csdetails"));
+                                if (jsonArr.length() > 0) {
+                                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                            .setTitleText("Confirm?")
+                                            .setContentText("All card details will be wiped permanently. Sure to proceed?")
+                                            .setConfirmText("Delete")
+                                            .setCancelText("Cancel")
+                                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                                @Override
+                                                public void onClick(SweetAlertDialog sDialog) {
+                                                    ss.removeData("csdetails");
+                                                    finish();
+                                                    startActivity(getIntent());
+                                                    Toast.makeText(MainActivity.this, "Data deleted permanently", Toast.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .showCancelButton(true)
+                                            .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                                @Override
+                                                public void onClick(SweetAlertDialog sDialog) {
+                                                    sDialog.cancel();
+                                                }
+                                            })
+                                            .show();
+                                } else
+                                    Toast.makeText(MainActivity.this, "No card details found", Toast.LENGTH_SHORT).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else
+                            Toast.makeText(MainActivity.this, "No card details found", Toast.LENGTH_SHORT).show();
+                        fabWithOptions.closeOptionsMenu();
+                        break;
+                    case R.id.howto:
+                        startActivity(new Intent(MainActivity.this, IntroActivity.class).putExtra("howto",true));
+                        fabWithOptions.closeOptionsMenu();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
 
     private void addCardListener(final int index, CreditCardView creditCardView) {
         creditCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 final CreditCardView creditCardView = (CreditCardView) v;
-//                String cardNumber = creditCardView.getCardNumber();
-//                String expiry = creditCardView.getExpiry();
-//                String cardHolderName = creditCardView.getCardHolderName();
-//                String cvv = creditCardView.getCVV();
-//
-//                Intent intent = new Intent(MainActivity.this, CardEditActivity.class);
-//                intent.putExtra(CreditCardUtils.EXTRA_CARD_HOLDER_NAME, cardHolderName);
-//                intent.putExtra(CreditCardUtils.EXTRA_CARD_NUMBER, cardNumber);
-//                intent.putExtra(CreditCardUtils.EXTRA_CARD_EXPIRY, expiry);
-//                intent.putExtra(CreditCardUtils.EXTRA_CARD_SHOW_CARD_SIDE, CreditCardUtils.CARD_SIDE_BACK);
-//                intent.putExtra(CreditCardUtils.EXTRA_VALIDATE_EXPIRY_DATE, false);
-//
-//                // start at the CVV activity to edit it as it is not being passed
-//                intent.putExtra(CreditCardUtils.EXTRA_ENTRY_START_PAGE, CreditCardUtils.CARD_CVV_PAGE);
                 creditCardView.showBack();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -229,8 +266,6 @@ public class MainActivity extends AppCompatActivity {
                         creditCardView.showFront();
                     }
                 }, 1000);
-
-//                startActivityForResult(intent, index);
             }
         });
 
@@ -250,7 +285,6 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
 
         if (resultCode == RESULT_OK) {
-//            Debug.printToast("Result Code is OK", getApplicationContext());
 
             String name = data.getStringExtra(CreditCardUtils.EXTRA_CARD_HOLDER_NAME);
             String cardNumber = data.getStringExtra(CreditCardUtils.EXTRA_CARD_NUMBER);
@@ -271,7 +305,36 @@ public class MainActivity extends AppCompatActivity {
                 addCardListener(index, creditCardView);
                 saveCard(creditCardView);
 
-            } else {
+            } else if (reqCode == MY_SCAN_REQUEST_CODE) {
+                String resultDisplayStr;
+                if (data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
+                    CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
+
+                    // Never log a raw card number. Avoid displaying it, but if necessary use getFormattedCardNumber()
+                    resultDisplayStr = "Card Number: " + scanResult.getRedactedCardNumber() + "\n";
+
+                    // Do something with the raw number, e.g.:
+                    // myService.setCardNumber( scanResult.cardNumber );
+
+                    if (scanResult.isExpiryValid()) {
+                        resultDisplayStr += "Expiration Date: " + scanResult.expiryMonth + "/" + scanResult.expiryYear + "\n";
+                    }
+
+                    if (scanResult.cvv != null) {
+                        // Never log or display a CVV
+                        resultDisplayStr += "CVV has " + scanResult.cvv.length() + " digits.\n";
+                    }
+
+                    if (scanResult.postalCode != null) {
+                        resultDisplayStr += "Postal Code: " + scanResult.postalCode + "\n";
+                    }
+                }
+                else {
+                    resultDisplayStr = "Scan was canceled.";
+                }
+                // do something with resultDisplayStr, maybe display it in a textView
+                // resultTextView.setText(resultDisplayStr);
+            }else{
 
                 CreditCardView creditCardView = (CreditCardView) cardContainer.getChildAt(reqCode);
 
@@ -295,13 +358,11 @@ public class MainActivity extends AppCompatActivity {
             jsonObj.put("expiry", creditCardView.getExpiry());
             jsonObj.put("cvv", creditCardView.getCVV());
 
-            if (sharedpreferences.getString("csdetails", "NULL") != "NULL")
-                jsonArr = new JSONArray(sharedpreferences.getString("csdetails", "NULL"));
+            if (ss.readData("csdetails") != "NULL")
+                jsonArr = new JSONArray(ss.readData("csdetails"));
             jsonArr.put(jsonObj);
 
-            editor.putString("csdetails", jsonArr.toString());
-            editor.commit();
-//            Log.d("Debug",jsonObj.toString());
+            ss.storData("csdetails",jsonArr.toString());
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -318,4 +379,24 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
         }
     }
+
+    public void onScanPress() {
+        Intent scanIntent = new Intent(this, CardIOActivity.class);
+
+        // customize these values to suit your needs.
+        scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, true); // default: false
+        scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_CVV, false); // default: false
+        scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_POSTAL_CODE, false); // default: false
+
+        // MY_SCAN_REQUEST_CODE is arbitrary and is only used within this activity.
+        startActivityForResult(scanIntent, MY_SCAN_REQUEST_CODE);
+    }
+
+//    @Override
+//    public void onBackPressed() {
+//        if(fabWithOptions.isOptionsMenuOpened())
+//            fabWithOptions.closeOptionsMenu();
+//        else
+//            finish();
+//    }
 }

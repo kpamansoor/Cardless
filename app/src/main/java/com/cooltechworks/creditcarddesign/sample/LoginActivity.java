@@ -1,83 +1,26 @@
 package com.cooltechworks.creditcarddesign.sample;
-
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.KeyguardManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.hardware.fingerprint.FingerprintManager;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.TextUtils;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.cooltechworks.checkoutflow.R;
 import com.kevalpatel.passcodeview.KeyNamesBuilder;
-import com.kevalpatel.passcodeview.PatternView;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.keys.RoundKey;
-import com.kevalpatel.passcodeview.patternCells.CirclePatternCell;
-import com.kevalpatel.passcodeview.patternCells.PatternPoint;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-
-import static android.Manifest.permission.READ_CONTACTS;
-import static android.Manifest.permission.SIGNAL_PERSISTENT_PROCESSES;
-
-/**
- * A login screen that offers login via email/password.
- */
 public class LoginActivity extends Activity {
 
-
-    private static final String KEY_NAME = "cardless";
-    private SharedPreferences sharedpreferences;
+    SecureStorage ss;
 
     TextView message;
     @Override
@@ -89,9 +32,9 @@ public class LoginActivity extends Activity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar));
 
-        sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
+        ss =  new SecureStorage(LoginActivity.this, getApplication());
 
-        if(sharedpreferences.getString("pin","NULL") == "NULL") {
+        if(ss.readData("pin") == "NULL") {
             startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
             finish();
         }
@@ -100,8 +43,8 @@ public class LoginActivity extends Activity {
 
 
         PinView pinView = (PinView) findViewById(R.id.pin_view);
-        if(sharedpreferences.getString("pin","NULL") != "NULL") {
-            pinView.setCorrectPin(parseInt(sharedpreferences.getString("pin","NULL").toString()));
+        if(ss.readData("pin") != "NULL") {
+            pinView.setCorrectPin(parseInt(ss.readData("pin").toString()));
         }
 //        pinView.setCorrectPin(new int[]{1, 2, 3, 4});
 

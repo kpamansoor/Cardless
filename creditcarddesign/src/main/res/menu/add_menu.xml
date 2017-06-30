@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/add_manual"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="New Card : Manual" />
+
+    <item
+        android:id="@+id/add_auto"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="New Card : by Snap" />
+
+    <item
+        android:id="@+id/change_pin"
+        android:icon="@android:drawable/ic_lock_idle_lock"
+        android:title="Change PIN" />
+
+    <item
+        android:id="@+id/delete_all"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="Delete All"/>
+
+    <item
+        android:id="@+id/howto"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="How to use"/>
+</menu>

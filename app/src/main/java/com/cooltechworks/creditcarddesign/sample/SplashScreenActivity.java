@@ -22,7 +22,7 @@ import com.cooltechworks.checkoutflow.R;
 public class SplashScreenActivity extends AppCompatActivity {
 
     LinearLayout layout;
-    private SharedPreferences sharedpreferences;
+    SecureStorage ss;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +32,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar));
 
+        ss =  new SecureStorage(SplashScreenActivity.this, getApplication());
         layout = (LinearLayout) findViewById(R.id.layout);
         fadeInAnimation(layout);
     }
@@ -51,9 +52,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        sharedpreferences = getSharedPreferences("mysp", Context.MODE_PRIVATE);
 
-                        if(sharedpreferences.getString("pin","NULL") == "NULL") {
+                        if(ss.readData("pin") == "NULL") {
                             startActivity(new Intent(SplashScreenActivity.this, IntroActivity.class).putExtra("howto",false));
                         }else
                             startActivity(new Intent(SplashScreenActivity.this, LoginActivity.class));
