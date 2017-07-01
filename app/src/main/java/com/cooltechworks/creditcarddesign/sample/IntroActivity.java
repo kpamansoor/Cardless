@@ -18,6 +18,7 @@ import com.cooltechworks.checkoutflow.R;
 public class IntroActivity extends AppCompatActivity {
 
     RelativeLayout fullpage;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
