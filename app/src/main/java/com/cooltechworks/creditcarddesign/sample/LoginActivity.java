@@ -3,6 +3,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.keys.RoundKey;
+import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
 
 public class LoginActivity extends Activity {
 
@@ -88,6 +90,27 @@ public class LoginActivity extends Activity {
                 //Do something if you want to handle unauthorized user.
             }
         });
+    }
+
+    public void forgotPIN(View view){
+        new LovelyTextInputDialog(this, R.style.TintTheme)
+                .setTopColorRes(R.color.blue_btn_bg_color)
+                .setTitle("Forgot PIN")
+                .setMessage("Enter last 8 digits of any of ur savedcard.")
+                .setIcon(R.drawable.common_google_signin_btn_icon_dark)
+                .setInputFilter("", new LovelyTextInputDialog.TextFilter() {
+                    @Override
+                    public boolean check(String text) {
+                        return text.matches("\\d{10}");
+                    }
+                })
+                .setConfirmButton(android.R.string.ok, new LovelyTextInputDialog.OnTextInputConfirmListener() {
+                    @Override
+                    public void onTextInputConfirmed(String text) {
+                        Toast.makeText(LoginActivity.this, text, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
     }
 
     private static int[] parseInt(String str) {

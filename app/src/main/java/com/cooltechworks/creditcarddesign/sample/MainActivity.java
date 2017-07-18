@@ -392,11 +392,11 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(scanIntent, MY_SCAN_REQUEST_CODE);
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if(fabWithOptions.isOptionsMenuOpened())
-//            fabWithOptions.closeOptionsMenu();
-//        else
-//            finish();
-//    }
+    @Override
+    public void onBackPressed() {
+        if(fabWithOptions.isOptionsMenuOpened())
+            fabWithOptions.closeOptionsMenu();
+        else
+            finish();
+    }
 }

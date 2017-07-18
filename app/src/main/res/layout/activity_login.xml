@@ -23,6 +23,14 @@
         android:src="@drawable/logo_main"
         tools:ignore="ContentDescription"/>
     <TextView
+        android:id="@+id/tvForgotPIN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forgot PIN?"
+        android:textColor="@color/logo_color"
+        android:layout_alignParentRight="true"
+        android:onClick="forgotPIN"/>
+    <TextView
         android:id="@+id/text3"
         android:layout_below="@id/imageView"
         android:layout_width="wrap_content"
