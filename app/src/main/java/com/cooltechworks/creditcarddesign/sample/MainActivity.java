@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final int CREATE_NEW_CARD = 0;
     private final int MY_SCAN_REQUEST_CODE = 1;
+    private final int MY_SCAN_RESULT_CODE = 13274384;
     private LinearLayout cardContainer;
     private TextView addCardButton;
     private ImageView imgSettings;
@@ -200,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.add_auto:
                         onScanPress();
                         fabWithOptions.closeOptionsMenu();
+                        break;
                     case R.id.change_pin:
                         startActivity(new Intent(MainActivity.this, SignUpActivity.class));
                         fabWithOptions.closeOptionsMenu();
@@ -305,44 +307,22 @@ public class MainActivity extends AppCompatActivity {
                 addCardListener(index, creditCardView);
                 saveCard(creditCardView);
 
-            } else if (reqCode == MY_SCAN_REQUEST_CODE) {
-                String resultDisplayStr;
-                if (data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
-                    CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
+            }
+        }else if (resultCode == MY_SCAN_RESULT_CODE) {
+            if (data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
+                CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
 
-                    // Never log a raw card number. Avoid displaying it, but if necessary use getFormattedCardNumber()
-                    resultDisplayStr = "Card Number: " + scanResult.getRedactedCardNumber() + "\n";
+                CreditCardView creditCardView = new CreditCardView(this);
 
-                    // Do something with the raw number, e.g.:
-                    // myService.setCardNumber( scanResult.cardNumber );
+                creditCardView.setCVV(scanResult.cvv);
+                creditCardView.setCardHolderName(scanResult.cardholderName);
+                creditCardView.setCardExpiry(scanResult.expiryMonth + "/" + scanResult.expiryYear);
+                creditCardView.setCardNumber(scanResult.cardNumber);
 
-                    if (scanResult.isExpiryValid()) {
-                        resultDisplayStr += "Expiration Date: " + scanResult.expiryMonth + "/" + scanResult.expiryYear + "\n";
-                    }
-
-                    if (scanResult.cvv != null) {
-                        // Never log or display a CVV
-                        resultDisplayStr += "CVV has " + scanResult.cvv.length() + " digits.\n";
-                    }
-
-                    if (scanResult.postalCode != null) {
-                        resultDisplayStr += "Postal Code: " + scanResult.postalCode + "\n";
-                    }
-                }
-                else {
-                    resultDisplayStr = "Scan was canceled.";
-                }
-                // do something with resultDisplayStr, maybe display it in a textView
-                // resultTextView.setText(resultDisplayStr);
-            }else{
-
-                CreditCardView creditCardView = (CreditCardView) cardContainer.getChildAt(reqCode);
-
-                creditCardView.setCardExpiry(expiry);
-                creditCardView.setCardNumber(cardNumber);
-                creditCardView.setCardHolderName(name);
-                creditCardView.setCVV(cvv);
-
+                cardContainer.addView(creditCardView);
+                int index = cardContainer.getChildCount() - 1;
+                addCardListener(index, creditCardView);
+                saveCard(creditCardView);
             }
         }
 
@@ -385,8 +365,11 @@ public class MainActivity extends AppCompatActivity {
 
         // customize these values to suit your needs.
         scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, true); // default: false
-        scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_CVV, false); // default: false
-        scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_POSTAL_CODE, false); // default: false
+        scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_CVV, true); // default: false
+        scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_CARDHOLDER_NAME, true); // default: false
+        scanIntent.putExtra(CardIOActivity.EXTRA_SCAN_EXPIRY, true); // default: false
+        scanIntent.putExtra(CardIOActivity.EXTRA_SCAN_INSTRUCTIONS, true); // default: false
+        scanIntent.putExtra(CardIOActivity.EXTRA_USE_PAYPAL_ACTIONBAR_ICON, false); // default: false
 
         // MY_SCAN_REQUEST_CODE is arbitrary and is only used within this activity.
         startActivityForResult(scanIntent, MY_SCAN_REQUEST_CODE);

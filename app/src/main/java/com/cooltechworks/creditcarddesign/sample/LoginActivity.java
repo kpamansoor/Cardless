@@ -9,9 +9,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+
 import com.cooltechworks.checkoutflow.R;
 import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
@@ -19,6 +17,10 @@ import com.kevalpatel.passcodeview.indicators.CircleIndicator;
 import com.kevalpatel.passcodeview.interfaces.AuthenticationListener;
 import com.kevalpatel.passcodeview.keys.RoundKey;
 import com.yarolegovich.lovelydialog.LovelyTextInputDialog;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginActivity extends Activity {
 
@@ -93,24 +95,80 @@ public class LoginActivity extends Activity {
     }
 
     public void forgotPIN(View view){
-        new LovelyTextInputDialog(this, R.style.TintTheme)
-                .setTopColorRes(R.color.blue_btn_bg_color)
-                .setTitle("Forgot PIN")
-                .setMessage("Enter last 8 digits of any of ur savedcard.")
-                .setIcon(R.drawable.common_google_signin_btn_icon_dark)
-                .setInputFilter("", new LovelyTextInputDialog.TextFilter() {
-                    @Override
-                    public boolean check(String text) {
-                        return text.matches("\\d{10}");
+        if(checkIfCardsAvailable()) {
+            new LovelyTextInputDialog(this, R.style.TintTheme)
+                    .setTopColorRes(R.color.status_bar)
+                    .setTitle("Forgot PIN?")
+                    .setMessage("Found saved card(s).Enter last 8 digits of any saved card")
+                    .setIcon(R.drawable.forgot_pass)
+                    .setInputFilter("Key in 8 digit", new LovelyTextInputDialog.TextFilter() {
+                        @Override
+                        public boolean check(String text) {
+                            return text.matches("\\d{8}");
+                        }
+                    })
+                    .setConfirmButton(android.R.string.ok, new LovelyTextInputDialog.OnTextInputConfirmListener() {
+                        @Override
+                        public void onTextInputConfirmed(String text) {
+
+                            if(matchCardData(text)){
+                                Toast.makeText(LoginActivity.this, "Set your new PIN.", Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+                                finish();
+                            }else
+                                Toast.makeText(LoginActivity.this, "No matching cards found.", Toast.LENGTH_LONG).show();
+
+                        }
+                    })
+                    .show();
+        }else {
+            Toast.makeText(LoginActivity.this, "No saved cards found, set new PIN to continue.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean checkIfCardsAvailable() {
+        if (!ss.readData("csdetails").equals("NULL")) {
+            JSONArray jsonArr;
+            try {
+                jsonArr = new JSONArray(ss.readData("csdetails"));
+                if(jsonArr.length() > 0)
+                    return true;
+                else
+                    return false;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    private boolean matchCardData(String str) {
+        boolean response = false;
+
+        if (!ss.readData("csdetails").equals("NULL")) {
+            JSONArray jsonArr;
+            JSONObject cards;
+            try {
+                jsonArr = new JSONArray(ss.readData("csdetails"));
+                for (int i = 0; i < jsonArr.length(); i++) {
+                    cards = (JSONObject) jsonArr.get(i);
+                    if (cards.getString("number").contains(str)) {
+                        response = true;
+                        break;
                     }
-                })
-                .setConfirmButton(android.R.string.ok, new LovelyTextInputDialog.OnTextInputConfirmListener() {
-                    @Override
-                    public void onTextInputConfirmed(String text) {
-                        Toast.makeText(LoginActivity.this, text, Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .show();
+                }
+                return response;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return response;
+            }
+
+
+        }
+        return false;
     }
 
     private static int[] parseInt(String str) {

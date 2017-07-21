@@ -72,6 +72,9 @@
         app:keypadHorizontalSpacing="15dp"
         app:keypadButtonBackgroundDrawable="@drawable/ring_shape"
         app:dotFilledBackground="@drawable/round_shape"
+        app:dotDiameter="20dp"
+        app:dotSpacing="16dp"
+        app:indicatorType="fillWithAnimation"
     />
 </LinearLayout>
 </LinearLayout>
