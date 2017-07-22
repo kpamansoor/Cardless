@@ -52,17 +52,18 @@ public class MainActivity extends AppCompatActivity {
     private InterstitialAd mInterstitialAd;
     SecureStorage ss;
     OptionsFabLayout fabWithOptions;
+    private boolean showAds = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259830");// Testing
-//        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259828");// Production
+//        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259830");// Testing
+        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259828");// Production
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // Testing
-//        mInterstitialAd.setAdUnitId("ca-app-pub-1243068719441957/7477993022"); // Production
+//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // Testing
+        mInterstitialAd.setAdUnitId("ca-app-pub-1243068719441957/7477993022"); // Production
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
         ss =  new SecureStorage(MainActivity.this, getApplication());
 
@@ -194,19 +195,23 @@ public class MainActivity extends AppCompatActivity {
             public void onMiniFabSelected(MenuItem fabItem) {
                 switch (fabItem.getItemId()) {
                     case R.id.add_manual:
+                        showAds = true;
                         Intent intent = new Intent(MainActivity.this, CardEditActivity.class);
                         startActivityForResult(intent, CREATE_NEW_CARD);
                         fabWithOptions.closeOptionsMenu();
                         break;
                     case R.id.add_auto:
+                        showAds = false;
                         onScanPress();
                         fabWithOptions.closeOptionsMenu();
                         break;
                     case R.id.change_pin:
+                        showAds = true;
                         startActivity(new Intent(MainActivity.this, SignUpActivity.class));
                         fabWithOptions.closeOptionsMenu();
                         break;
                     case R.id.delete_all:
+                        showAds = true;
                         JSONObject jsonObj = new JSONObject();
                         JSONArray jsonArr = new JSONArray();
                         if (ss.readData("csdetails") != "NULL") {
@@ -245,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
                         fabWithOptions.closeOptionsMenu();
                         break;
                     case R.id.howto:
+                        showAds = true;
                         startActivity(new Intent(MainActivity.this, IntroActivity.class).putExtra("howto",true));
                         fabWithOptions.closeOptionsMenu();
                         break;
@@ -353,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mInterstitialAd.isLoaded()) {
+        if (mInterstitialAd.isLoaded() && showAds) {
             mInterstitialAd.show();
         } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
