@@ -26,6 +26,7 @@ import com.cooltechworks.creditcarddesign.CreditCardUtils;
 import com.github.ag.floatingactionmenu.OptionsFabLayout;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
@@ -65,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
 //        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // Testing
         mInterstitialAd.setAdUnitId("ca-app-pub-1243068719441957/7477993022"); // Production
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         ss =  new SecureStorage(MainActivity.this, getApplication());
 
         Window window = this.getWindow();
@@ -360,7 +366,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         if (mInterstitialAd.isLoaded() && showAds) {
-            mInterstitialAd.show();
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mInterstitialAd.show();
+                }
+            }, 10000);
+
         } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
         }

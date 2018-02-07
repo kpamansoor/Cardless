@@ -44,9 +44,9 @@
     <com.kevalpatel.passcodeview.PinView
         android:id="@+id/pin_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/text3"
-        android:padding="30dp"
+        android:padding="20dp"
         android:layout_marginTop="5dp"
         app:dividerColor="@color/bluishgreen"
         app:pin_titleText="Enter your PIN"
@@ -56,5 +56,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/message"/>
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="ca-app-pub-1243068719441957/5043101408"
+        >
+    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

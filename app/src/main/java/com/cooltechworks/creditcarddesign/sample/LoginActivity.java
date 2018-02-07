@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 
 import com.cooltechworks.checkoutflow.R;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.kevalpatel.passcodeview.KeyNamesBuilder;
 import com.kevalpatel.passcodeview.PinView;
 import com.kevalpatel.passcodeview.indicators.CircleIndicator;
@@ -35,6 +37,10 @@ public class LoginActivity extends Activity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar));
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         ss =  new SecureStorage(LoginActivity.this, getApplication());
 
