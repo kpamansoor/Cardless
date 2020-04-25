@@ -3,9 +3,11 @@ package com.cooltechworks.creditcarddesign.sample;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
@@ -34,7 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 
@@ -224,25 +225,25 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 jsonArr = new JSONArray(ss.readData("csdetails"));
                                 if (jsonArr.length() > 0) {
-                                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                            .setTitleText("Confirm?")
-                                            .setContentText("All card details will be wiped permanently. Sure to proceed?")
-                                            .setConfirmText("Delete")
-                                            .setCancelText("Cancel")
-                                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+
+                                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .setTitle("Confirm?")
+                                            .setMessage("All card details will be wiped permanently. Sure to proceed?")
+                                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                                 @Override
-                                                public void onClick(SweetAlertDialog sDialog) {
+                                                public void onClick(DialogInterface dialogInterface, int i) {
                                                     ss.removeData("csdetails");
                                                     finish();
                                                     startActivity(getIntent());
                                                     Toast.makeText(MainActivity.this, "Data deleted permanently", Toast.LENGTH_SHORT).show();
                                                 }
                                             })
-                                            .showCancelButton(true)
-                                            .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                                 @Override
-                                                public void onClick(SweetAlertDialog sDialog) {
-                                                    sDialog.cancel();
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+
                                                 }
                                             })
                                             .show();
@@ -267,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addCardListener(final int index, CreditCardView creditCardView) {
+    private void addCardListener(final int index, final CreditCardView creditCardView) {
         creditCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -285,12 +286,64 @@ public class MainActivity extends AppCompatActivity {
 
         creditCardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View view) {
-                Toast.makeText(MainActivity.this, "Card no copied to clipboad", Toast.LENGTH_SHORT).show();
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                final CreditCardView creditCardView = (CreditCardView) view;
-                ClipData clip = ClipData.newPlainText("text", creditCardView.getCardNumber());
-                clipboard.setPrimaryClip(clip);
+            public boolean onLongClick(final View view) {
+                //Creating the instance of PopupMenu
+                PopupMenu popup = new PopupMenu(MainActivity.this, creditCardView);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater().inflate(R.menu.card_action, popup.getMenu());
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        final CreditCardView creditCardView = (CreditCardView) view;
+                        if(item.getTitle().equals("Copy Card Number")){
+                            Toast.makeText(MainActivity.this, "Card no copied to clipboad", Toast.LENGTH_SHORT).show();
+                            ClipData clip = ClipData.newPlainText("text", creditCardView.getCardNumber());
+                            clipboard.setPrimaryClip(clip);
+                        }else {
+                            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle("Confirm?")
+                                    .setMessage("This card will be deleted permanently. Sure to proceed?")
+                                    .setPositiveButton("Yes, Delete", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            JSONObject jsonObj = new JSONObject();
+                                            JSONArray jsonArr = new JSONArray();
+                                            if (ss.readData("csdetails") != "NULL") {
+                                                try {
+                                                    jsonArr = new JSONArray(ss.readData("csdetails"));
+                                                    for (int j=0; j < jsonArr.length(); j++) {
+                                                        if(jsonArr.getJSONObject(j).get("number").equals(creditCardView.getCardNumber())){
+                                                            jsonArr.remove(j);
+                                                        }
+                                                    }
+                                                    ss.storData("csdetails",jsonArr.toString());
+                                                    Toast.makeText(MainActivity.this, "Card deleted", Toast.LENGTH_SHORT).show();
+                                                    finish();
+                                                    startActivity(getIntent());
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        }
+                                    })
+                                    .show();
+                        }
+                        return true;
+                    }
+                });
+
+                popup.show();//showing popup menu
+
                 return true;
             }
         });
